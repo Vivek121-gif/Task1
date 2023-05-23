@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .box {
+      width: 50px;
+      height: 50px;
+      display: inline-block;
+      border: 1px solid black;
+      background-color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <script>
+      // Function to handle box click event
+      function handleClick(row, col) {
+        var clickedBox = document.getElementById('box-' + row + '-' + col);
+        var adjacentBoxes = [
+          [row - 1, col], // top
+          [row + 1, col], // bottom
+          [row, col - 1], // left
+          [row, col + 1]  // right
+        ];
+
+        // Check if any adjacent box is red
+        for (var i = 0; i < adjacentBoxes.length; i++) {
+          var boxRow = adjacentBoxes[i][0];
+          var boxCol = adjacentBoxes[i][1];
+          var adjacentBox = document.getElementById('box-' + boxRow + '-' + boxCol);
+          if (adjacentBox && adjacentBox.style.backgroundColor === 'red') {
+            alert('You should not click on the adjacent red box!');
+            return;
+          }
+        }
+
+        // Set clicked box to red and adjacent boxes to white
+        clickedBox.style.backgroundColor = 'red';
+        for (var i = 0; i < adjacentBoxes.length; i++) {
+          var boxRow = adjacentBoxes[i][0];
+          var boxCol = adjacentBoxes[i][1];
+          var adjacentBox = document.getElementById('box-' + boxRow + '-' + boxCol);
+          if (adjacentBox) {
+            adjacentBox.style.backgroundColor = 'white';
+          }
+        }
+      }
+
+      // Create the grid of boxes
+      var container = document.getElementById('container');
+      for (var row = 0; row < 6; row++) {
+        for (var col = 0; col < 6; col++) {
+          var box = document.createElement('div');
+          box.className = 'box';
+          box.id = 'box-' + row + '-' + col;
+          box.addEventListener('click', handleClick.bind(null, row, col));
+          container.appendChild(box);
+        }
+        container.appendChild(document.createElement('br'));
+      }
+    </script>
+  </div>
+</body>
+</html>
