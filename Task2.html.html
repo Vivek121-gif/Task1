@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+ 
+</head>
+
+<body style="background-color: rgb(16, 16, 64);">
+
+      <h1 style="color:white">Clothing Store</h1>
+      <div class="mb-3">
+        <button id="filter-btn" class="btn btn-primary">Price: Low to High</button>
+      </div>
+
+      <div   id="productsDiv" class="row" style="margin: 20px;">
+         
+      </div>
+
+      <h2 style="color:white">Cart</h2>
+    <ul id="cart-list" style="color:white"></ul>
+
+
+</body>
+
+
+<script>
+
+    fetch('https://fakestoreapi.com/products/')
+      .then(response => response.json())
+      .then(products => {
+        let allProducts = products;
+        let cartItems = [];
+    
+        function renderProducts(productList) {
+          const productListContainer = document.getElementById('productsDiv');
+          productListContainer.innerHTML = '';
+    
+          productList.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.classList.add('col-lg-3', 'col-md-5', 'mb-5');
+            productCard.innerHTML = `
+              <div class="card" >
+                <img src="${product.image || 'default-image.jpg'}" class="card-img-top" alt="${product.title} width="150px" height="180px">
+                <div class="card-body">
+                  <h5 class="card-title">${product.title}</h5>
+                  <p class="card-text">Price: $${product.price}</p>
+                  <input type="button" class="btn btn-primary add-to-cart-btn"  data-product-id="${product.id}" value="Add to Cart"/>
+                </div>
+              </div>
+            `;
+            productListContainer.appendChild(productCard);
+          });
+        }
+    
+        function filterByPriceLowToHigh() {
+          const sortedProducts = allProducts.sort((a, b) => a.price - b.price);
+          renderProducts(sortedProducts);
+        }
+    
+        function addToCart(productId) { 
+            const productToAdd = allProducts.find(product => product.id === productId); 
+          if (productToAdd) {
+            cartItems.push(productToAdd);
+            renderCart();
+          }
+        }
+    
+        function removeFromCart(productId) {
+          cartItems = cartItems.filter(item => item.id !==productId);
+          renderCart();
+        }
+    
+        function renderCart() {
+          const cartList = document.getElementById('cart-list');
+          cartList.innerHTML = '';
+    
+          cartItems.forEach(item => {
+            const cartItem = document.createElement('li');
+            cartItem.innerHTML = `
+              ${item.title} - $${item.price}
+              <button class="btn btn-danger btn-sm ml-2 remove-from-cart-btn" data-product-id="${item.id}">Remove</button>
+            `;
+            cartList.appendChild(cartItem);
+          });
+        }
+    
+        renderProducts(allProducts);
+    
+        const filterBtn = document.getElementById('filter-btn');
+        filterBtn.addEventListener('click', filterByPriceLowToHigh);
+    
+        const productContainer = document.getElementById('productsDiv');
+        productContainer.addEventListener('click', function(event) {
+          if (event.target.classList.contains('add-to-cart-btn')) {
+            const productId = event.target.getAttribute('data-product-id');
+            addToCart(productId);
+          }
+        });
+    
+        const cartContainer = document.getElementById('cart-list');
+        cartContainer.addEventListener('click', function(event) {
+          if (event.target.classList.contains('remove-from-cart-btn')) {
+            const productId = event.target.getAttribute('data-product-id');
+            removeFromCart(productId);
+          }
+        });
+      })
+      .catch(error => {
+        console.log('Error:', error);
+      });
+    </script>
+
+</html>
